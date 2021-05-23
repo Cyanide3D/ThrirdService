@@ -1,10 +1,9 @@
 package com.example.ThrirdService;
 
-import com.example.ThrirdService.model.UnloadingReport;
 import com.example.ThrirdService.model.Ship;
+import com.example.ThrirdService.model.UnloadingReport;
 
-import java.time.*;
-import java.time.temporal.TemporalUnit;
+import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
 
 public class Crane implements Callable<UnloadingReport> {
@@ -19,15 +18,15 @@ public class Crane implements Callable<UnloadingReport> {
 
     @Override
     public UnloadingReport call() {
-        int awaitTime = Math.abs(currentDate.getHour() - ship.getArrivalTime());
+        LocalDateTime arrivalTime = currentDate.plusMinutes(ship.getArrivalTime());
 
         return new UnloadingReport().builder()
                 .setArrivalTime(ship.getArrivalTime())
                 .setShipName(ship.getName())
                 .setStartUnloadingTime(currentDate)
-                .setAwaitTime(awaitTime)
+                .setAwaitTime(100)
                 .setUnloadingTime(ship.getUnloadingTime())
-                .setFine(awaitTime * 100)
+                .setFine((100/60) * 100)
                 .setCargoType(ship.getCranePerformance())
                 .build();
     }

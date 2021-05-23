@@ -1,11 +1,9 @@
 package com.example.ThrirdService.model;
 
-import com.example.ThrirdService.service.CraneHolder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Report {
 
@@ -17,9 +15,8 @@ public class Report {
     private int maxUnloadTime;
     private int avgUnloadTime;
     private int fine;
-    private int minNeedfulLiquidCraneAmount;
-    private int minNeedfulLooseCraneAmount;
-    private int minNeedfulContainerCraneAmount;
+    private int minNeedfulCraneAmount;
+
 
     public Report() {
         reports = new ArrayList<>();
@@ -31,7 +28,6 @@ public class Report {
 
     public void make() {
         amountOfShips = reports.size();
-        cranesQuantity = CraneHolder.getAllAmount();
 
         for (UnloadingReport report : reports) {
             fine += report.getFine();
@@ -103,27 +99,11 @@ public class Report {
         this.fine = fine;
     }
 
-    public int getMinNeedfulLiquidCraneAmount() {
-        return minNeedfulLiquidCraneAmount;
+    public int getMinNeedfulCraneAmount() {
+        return minNeedfulCraneAmount;
     }
 
-    public void setMinNeedfulLiquidCraneAmount(int minNeedfulLiquidCraneAmount) {
-        this.minNeedfulLiquidCraneAmount = minNeedfulLiquidCraneAmount;
-    }
-
-    public int getMinNeedfulLooseCraneAmount() {
-        return minNeedfulLooseCraneAmount;
-    }
-
-    public void setMinNeedfulLooseCraneAmount(int minNeedfulLooseCraneAmount) {
-        this.minNeedfulLooseCraneAmount = minNeedfulLooseCraneAmount;
-    }
-
-    public int getMinNeedfulContainerCraneAmount() {
-        return minNeedfulContainerCraneAmount;
-    }
-
-    public void setMinNeedfulContainerCraneAmount(int minNeedfulContainerCraneAmount) {
-        this.minNeedfulContainerCraneAmount = minNeedfulContainerCraneAmount;
+    public void setMinNeedfulCraneAmount(int minNeedfulCraneAmount) {
+        this.minNeedfulCraneAmount = minNeedfulCraneAmount;
     }
 }

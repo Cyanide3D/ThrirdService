@@ -2,13 +2,18 @@ package com.example.ThrirdService.service;
 
 import com.example.ThrirdService.Crane;
 import com.example.ThrirdService.model.Report;
-import com.example.ThrirdService.model.UnloadingReport;
 import com.example.ThrirdService.model.Ship;
+import com.example.ThrirdService.model.UnloadingReport;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -18,17 +23,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 @Service
 public class SchedulerService {
 
+    volatile LocalDateTime localDateTime = LocalDateTime.of(2021, 6, 1, 0, 0, 0, 1);
+
     @Autowired
     private ObjectMapper objectMapper;
+    private final String schedulesUrl = "http://localhost:8082/serialize";
 
     @SneakyThrows
     private List<Ship> downloadSchedules() {
-        List<Ship> schedules = objectMapper.readValue(new URL("http://localhost:8082/serialize"), new TypeReference<List<Ship>>() {});
+        List<Ship> schedules = objectMapper.readValue(new URL(schedulesUrl), new TypeReference<List<Ship>>() {});
         schedules.sort(Comparator.comparing(Ship::getArrivalTime));
 
         return schedules;
@@ -36,42 +43,40 @@ public class SchedulerService {
 
     @SneakyThrows
     public Report unloading() {
-        LocalDateTime localDateTime = LocalDateTime.now();
         List<Ship> schedules = downloadSchedules();
         Report report = new Report();
+        int fine = 50000;
+        int cranesQuantity = 0;
 
-        List<Ship> loose = schedules.stream().filter(ship -> ship.getCranePerformance() == 1).collect(Collectors.toList());
-        List<Ship> liquid = schedules.stream().filter(ship -> ship.getCranePerformance() == 2).collect(Collectors.toList());
-        List<Ship> container = schedules.stream().filter(ship -> ship.getCranePerformance() == 3).collect(Collectors.toList());
+        while (fine >= 30000 * cranesQuantity) {
+            cranesQuantity++;
+            ExecutorService executor = Executors.newFixedThreadPool(cranesQuantity);
+            createReport(report, localDateTime, schedules, executor);
+            report.make();
+            fine = report.getFine();
+            executor.shutdown();
+        }
+        report.setMinNeedfulCraneAmount(cranesQuantity);
+        report.setCranesQuantity(cranesQuantity);
 
-        unloadContainer(report, localDateTime, container);
-        unloadLoose(report, localDateTime, loose);
-        unloadLiquid(report, localDateTime, liquid);
+        sendReport(report);
 
-        report.make();
         return report;
     }
 
-    private void unloadLoose(Report report, LocalDateTime localDateTime, List<Ship> ships) throws ExecutionException, InterruptedException {
-        ExecutorService executor = Executors.newFixedThreadPool(CraneHolder.getLooseAmount());
-        createReport(report, localDateTime, ships, executor);
-    }
-
-    private void unloadLiquid(Report report, LocalDateTime localDateTime, List<Ship> ships) throws ExecutionException, InterruptedException  {
-        ExecutorService executor = Executors.newFixedThreadPool(CraneHolder.getLiquidAmount());
-        createReport(report, localDateTime, ships, executor);
-    }
-
-    private void unloadContainer(Report report, LocalDateTime localDateTime, List<Ship> ships) throws ExecutionException, InterruptedException  {
-        ExecutorService executor = Executors.newFixedThreadPool(CraneHolder.getContainerAmount());
-        createReport(report, localDateTime, ships, executor);
+    @SneakyThrows
+    private void sendReport(Report report) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(report), headers);
+        restTemplate.postForObject(schedulesUrl, request, String.class);
     }
 
     private synchronized void createReport(Report report, LocalDateTime localDateTime, List<Ship> ships, ExecutorService executor) throws InterruptedException, ExecutionException {
         for (Ship schedule : ships) {
             Future<UnloadingReport> result = executor.submit(new Crane(schedule, localDateTime));
             UnloadingReport unloadingReport = result.get();
-
             localDateTime = increaseCurrentDate(localDateTime, unloadingReport);
 
             report.addReport(unloadingReport);
