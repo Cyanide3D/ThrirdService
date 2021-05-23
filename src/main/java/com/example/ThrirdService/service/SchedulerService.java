@@ -4,6 +4,8 @@ import com.example.ThrirdService.Crane;
 import com.example.ThrirdService.model.Report;
 import com.example.ThrirdService.model.Ship;
 import com.example.ThrirdService.model.UnloadingReport;
+import com.example.ThrirdService.simple.SimpleUnloadStarter;
+import com.example.ThrirdService.simple.SimpleUnloadingReport;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -42,26 +44,27 @@ public class SchedulerService {
     }
 
     @SneakyThrows
-    public Report unloading() {
+    public List<SimpleUnloadingReport> unloading() {
         List<Ship> schedules = downloadSchedules();
         Report report = new Report();
-        int fine = 50000;
-        int cranesQuantity = 0;
+//        int fine = 50000;
+//        int cranesQuantity = 0;
+//
+//        while (fine >= 30000 * cranesQuantity) {
+//            cranesQuantity++;
+//            ExecutorService executor = Executors.newFixedThreadPool(cranesQuantity);
+//            createReport(report, localDateTime, schedules, executor);
+//            report.make();
+//            fine = report.getFine();
+//            executor.shutdown();
+//        }
+//        report.setMinNeedfulCraneAmount(cranesQuantity);
+//        report.setCranesQuantity(cranesQuantity);
+//
+//        sendReport(report);
 
-        while (fine >= 30000 * cranesQuantity) {
-            cranesQuantity++;
-            ExecutorService executor = Executors.newFixedThreadPool(cranesQuantity);
-            createReport(report, localDateTime, schedules, executor);
-            report.make();
-            fine = report.getFine();
-            executor.shutdown();
-        }
-        report.setMinNeedfulCraneAmount(cranesQuantity);
-        report.setCranesQuantity(cranesQuantity);
 
-        sendReport(report);
-
-        return report;
+        return new SimpleUnloadStarter().execute(schedules);
     }
 
     @SneakyThrows

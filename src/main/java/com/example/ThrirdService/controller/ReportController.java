@@ -2,6 +2,7 @@ package com.example.ThrirdService.controller;
 
 import com.example.ThrirdService.model.Report;
 import com.example.ThrirdService.service.SchedulerService;
+import com.example.ThrirdService.simple.SimpleUnloadingReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +19,7 @@ public class ReportController {
     private SchedulerService schedulerService;
 
     @GetMapping
-    public Report report() {
+    public List<SimpleUnloadingReport> report() {
         return schedulerService.unloading();
     }
 
