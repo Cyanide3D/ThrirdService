@@ -4,11 +4,12 @@ import com.example.ThrirdService.model.Cargo;
 import com.example.ThrirdService.model.Ship;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SimpleUnloadingReport {
 
-    private List<Ship> reports;
+    private List<SimpleShipUnloadingReport> reports;
     private Cargo.CargoType cargoType;
     private int fine;
     private int cranesQuantity;
@@ -19,18 +20,18 @@ public class SimpleUnloadingReport {
     private int staticAverageDelay;
 
     public SimpleUnloadingReport() {
-        reports = new ArrayList<>();
+        reports = Collections.synchronizedList(new ArrayList<>());
     }
 
-    public void add(List<Ship> report) {
-        reports.addAll(report);
+    public void add(SimpleShipUnloadingReport report) {
+        reports.add(report);
     }
 
-    public List<Ship> getReports() {
+    public List<SimpleShipUnloadingReport> getReports() {
         return reports;
     }
 
-    public void setReports(List<Ship> reports) {
+    public void setReports(List<SimpleShipUnloadingReport> reports) {
         this.reports = reports;
     }
 

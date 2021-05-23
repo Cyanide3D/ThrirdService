@@ -2,8 +2,11 @@ package com.example.ThrirdService.simple;
 
 import com.example.ThrirdService.model.Cargo;
 import com.example.ThrirdService.model.Ship;
+import com.example.ThrirdService.service.ReportService;
+import lombok.SneakyThrows;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -18,8 +21,7 @@ public class Unloading implements Callable<SimpleUnloadingReport> {
     private static int amountOfShips = 0;
     private int Avg = 0;
     private static int signal = 0;
-    private SimpleUnloadingReport report = new SimpleUnloadingReport();
-//    public int sizeOfQueue = 0;
+    //    public int sizeOfQueue = 0;
     private int cranesQuantity = 0;
 
     public int getTotalFine() {
@@ -39,8 +41,10 @@ public class Unloading implements Callable<SimpleUnloadingReport> {
         return fine;
     }
 
+    @SneakyThrows
     @Override
     public SimpleUnloadingReport call() {
+        SimpleUnloadingReport report = new SimpleUnloadingReport();
         int cranePrice = 30000;
         while (fine >= cranePrice * cranesQuantity) {
 //            if (cranesQuantity == 1) break;
@@ -59,7 +63,7 @@ public class Unloading implements Callable<SimpleUnloadingReport> {
                     cranes.add(crane);
                 }
                 try {
-                    List<Future<SimpleShipUnloadingReport>> result = executor.invokeAll(cranes);
+                    List<Future<SimpleShipUnloadingReport>> futures = executor.invokeAll(cranes);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -74,7 +78,7 @@ public class Unloading implements Callable<SimpleUnloadingReport> {
 //                for (Crane crane : cranes) {
 //                    fineWith1 += fine;
 //                    sizeOfQueue += crane.getSize();
-                    Avg = Crane.staticSizeOfQueue / cranes.size();
+                Avg = Crane.staticSizeOfQueue / cranes.size();
 //                }
 //                }
             }
@@ -85,8 +89,9 @@ public class Unloading implements Callable<SimpleUnloadingReport> {
 
 
         System.out.println("====================\n" + cargoType + "\n" + fine + "\nAmount of cranes: " + cranesQuantity
-                + "\nTotal fine: " + totalFine +  "\nAverage Size Of Queue: " + Crane.staticSizeOfQueue / cranes.size()
-                + "\nAmount Of Ships: " + amountOfShips +  "\nMax delay: " + Crane.staticDelay + "\nAverage delay " + Crane.staticAverageDelay+   "\n====================");
+                + "\nTotal fine: " + totalFine + "\nAverage Size Of Queue: " + Crane.staticSizeOfQueue / cranes.size()
+                + "\nAmount Of Ships: " + amountOfShips + "\nMax delay: " + Crane.staticDelay + "\nAverage delay " + Crane.staticAverageDelay + "\n====================");
+        ReportService reportService = ReportService.getInstance();
         report.setCargoType(cargoType);
         report.setCranesQuantity(cranesQuantity);
         report.setTotalFine(totalFine);
@@ -94,6 +99,7 @@ public class Unloading implements Callable<SimpleUnloadingReport> {
         report.setAmountOfShips(amountOfShips);
         report.setStaticDelay(Crane.staticDelay);
         report.setStaticAverageDelay(Crane.staticAverageDelay);
+        report.setReports(reportService.get());
 
         return report;
     }

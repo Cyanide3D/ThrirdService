@@ -1,6 +1,7 @@
 package com.example.ThrirdService.simple;
 
 import com.example.ThrirdService.model.Ship;
+import com.example.ThrirdService.service.ReportService;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -17,7 +18,7 @@ public class Crane implements Callable<SimpleShipUnloadingReport> {
     private int totalDelay = 0;
     private int delayShipsCount;
     public static int staticAverageDelay;
-    private SimpleShipUnloadingReport report = new SimpleShipUnloadingReport();
+    ReportService reportService = ReportService.getInstance();
 
     public int getCraneFine() {
         return craneFine;
@@ -33,6 +34,7 @@ public class Crane implements Callable<SimpleShipUnloadingReport> {
     }
 
     public SimpleShipUnloadingReport call() throws InterruptedException {
+        SimpleShipUnloadingReport report = new SimpleShipUnloadingReport();
         int currentTime = -43200;
         staticDelay++;
         int smeshenie = 0;
@@ -52,6 +54,7 @@ public class Crane implements Callable<SimpleShipUnloadingReport> {
             report.setDelay(0);
             report.setBeginTime(firstShip.getArrivalTime());
             report.setUnloadingTime(firstShip.getUnloadingTime());
+            reportService.add(report);
         }
         while (!ships.isEmpty()) {
             Ship currentShip = ships.peek();
@@ -84,6 +87,7 @@ public class Crane implements Callable<SimpleShipUnloadingReport> {
                 report.setDelay((smeshenie + ((currentShip.getArrivalTime() + currentShip.getUnloadingTime()) - nextShip.getArrivalTime())));
                 report.setBeginTime((smeshenie + (currentShip.getArrivalTime() + currentShip.getUnloadingTime())));
                 report.setUnloadingTime(nextShip.getUnloadingTime());
+                reportService.add(report);
                 maxDelay = (smeshenie + ((currentShip.getArrivalTime() + currentShip.getUnloadingTime())
                         - nextShip.getArrivalTime()));
                 totalDelay += (smeshenie + ((currentShip.getArrivalTime() + currentShip.getUnloadingTime())
@@ -108,13 +112,15 @@ public class Crane implements Callable<SimpleShipUnloadingReport> {
                 report.setDelay(0);
                 report.setBeginTime(nextShip.getArrivalTime());
                 report.setUnloadingTime(nextShip.getUnloadingTime());
+                reportService.add(report);
             }
             Thread.sleep(1);
         }
         staticSizeOfQueue = sizeOfQueue;
         staticDelay = maxDelay;
-        staticAverageDelay = totalDelay / delayShipsCount;
-
+        if (delayShipsCount > 0) {
+            staticAverageDelay = totalDelay / delayShipsCount;
+        }
         return report;
     }
 }
