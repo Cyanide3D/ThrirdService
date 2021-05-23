@@ -14,6 +14,7 @@ public class SimpleUnloadStarter {
 
     public List<SimpleUnloadingReport> execute(List<Ship> shipListFromSchedule) {
         List<SimpleUnloadingReport> reports = new ArrayList<>();
+        List<Ship> ships = new ArrayList<>();
         int threadsNumber = 3;
         Cargo.CargoType types[] = Cargo.CargoType.values();
         List<Unloading> unloadSchedule = new ArrayList<>(3);
@@ -24,6 +25,7 @@ public class SimpleUnloadStarter {
                     cargos.add(ship);
                 }
             }
+            ships.addAll(cargos);
             Unloading cargosUnloading = new Unloading(cargos);
             unloadSchedule.add(cargosUnloading);
         }
@@ -31,12 +33,13 @@ public class SimpleUnloadStarter {
         try {
             List<Future<SimpleUnloadingReport>> result = executor.invokeAll(unloadSchedule);
             for (Future<SimpleUnloadingReport> simpleUnloadingReportFuture : result) {
-                reports.add(simpleUnloadingReportFuture.get());
+                reports.addAll(List.of(simpleUnloadingReportFuture.get()));
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         executor.shutdown();
+        reports.get(0).add(ships);
 
         return reports;
     }

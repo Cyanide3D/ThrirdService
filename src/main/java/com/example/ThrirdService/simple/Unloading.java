@@ -60,10 +60,7 @@ public class Unloading implements Callable<SimpleUnloadingReport> {
                 }
                 try {
                     List<Future<SimpleShipUnloadingReport>> result = executor.invokeAll(cranes);
-                    for (Future<SimpleShipUnloadingReport> simpleShipUnloadingReportFuture : result) {
-                        report.add(simpleShipUnloadingReportFuture.get());
-                    }
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 executor.shutdown();

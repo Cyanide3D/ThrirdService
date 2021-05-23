@@ -1,13 +1,14 @@
 package com.example.ThrirdService.simple;
 
 import com.example.ThrirdService.model.Cargo;
+import com.example.ThrirdService.model.Ship;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SimpleUnloadingReport {
 
-    private List<SimpleShipUnloadingReport> reports;
+    private List<Ship> reports;
     private Cargo.CargoType cargoType;
     private int fine;
     private int cranesQuantity;
@@ -21,15 +22,15 @@ public class SimpleUnloadingReport {
         reports = new ArrayList<>();
     }
 
-    public void add(SimpleShipUnloadingReport report) {
-        reports.add(report);
+    public void add(List<Ship> report) {
+        reports.addAll(report);
     }
 
-    public List<SimpleShipUnloadingReport> getReports() {
+    public List<Ship> getReports() {
         return reports;
     }
 
-    public void setReports(List<SimpleShipUnloadingReport> reports) {
+    public void setReports(List<Ship> reports) {
         this.reports = reports;
     }
 
