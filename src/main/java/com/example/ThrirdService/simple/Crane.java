@@ -57,6 +57,7 @@ public class Crane implements Callable<SimpleShipUnloadingReport> {
             reportService.add(report);
         }
         while (!ships.isEmpty()) {
+            report = new SimpleShipUnloadingReport();
             Ship currentShip = ships.peek();
             ships.remove(currentShip);
             currentTime = Math.max(currentTime, currentShip.getArrivalTime());
@@ -87,13 +88,13 @@ public class Crane implements Callable<SimpleShipUnloadingReport> {
                 report.setDelay((smeshenie + ((currentShip.getArrivalTime() + currentShip.getUnloadingTime()) - nextShip.getArrivalTime())));
                 report.setBeginTime((smeshenie + (currentShip.getArrivalTime() + currentShip.getUnloadingTime())));
                 report.setUnloadingTime(nextShip.getUnloadingTime());
-                reportService.add(report);
                 maxDelay = (smeshenie + ((currentShip.getArrivalTime() + currentShip.getUnloadingTime())
                         - nextShip.getArrivalTime()));
                 totalDelay += (smeshenie + ((currentShip.getArrivalTime() + currentShip.getUnloadingTime())
                         - nextShip.getArrivalTime()));
                 smeshenie += (currentShip.getArrivalTime() + currentShip.getUnloadingTime()) - nextShip.getArrivalTime();
                 sizeOfQueue += 1;
+                reportService.add(report);
 
             } else {
                 System.out.println("-----------------------\nName: " + nextShip.getName() + "\nCargo type: " +
