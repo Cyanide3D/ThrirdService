@@ -22,11 +22,12 @@ public class SchedulerService {
 
     @Autowired
     private ObjectMapper objectMapper;
-    private final String schedulesUrl = "http://localhost:8082/serialize";
+    private final String SCHEDULES_URL = "http://localhost:8082/serialize";
+    private final String SCHEDULES_BY_FILENAME_URL = "http://localhost:8082/getJson/";
 
     @SneakyThrows
-    private List<Ship> downloadSchedules() {
-        List<Ship> schedules = objectMapper.readValue(new URL(schedulesUrl), new TypeReference<List<Ship>>() {});
+    private List<Ship> downloadSchedules(String url) {
+        List<Ship> schedules = objectMapper.readValue(new URL(url), new TypeReference<List<Ship>>() {});
         schedules.sort(Comparator.comparing(Ship::getArrivalTime));
 
         return schedules;
@@ -34,7 +35,15 @@ public class SchedulerService {
 
     @SneakyThrows
     public List<SimpleUnloadingReport> unloading() {
-        List<Ship> schedules = downloadSchedules();
+        List<Ship> schedules = downloadSchedules(SCHEDULES_URL);
+        List<SimpleUnloadingReport> reports = new SimpleUnloadStarter().execute(schedules);
+        sendReport(reports);
+
+        return reports;
+    }
+
+    public List<SimpleUnloadingReport> unloadingByFile(String filename) {
+        List<Ship> schedules = downloadSchedules(SCHEDULES_BY_FILENAME_URL + filename);
         List<SimpleUnloadingReport> reports = new SimpleUnloadStarter().execute(schedules);
         sendReport(reports);
 
@@ -47,6 +56,6 @@ public class SchedulerService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(reports), headers);
-        restTemplate.postForObject(schedulesUrl, request, String.class);
+        restTemplate.postForObject(SCHEDULES_URL, request, String.class);
     }
 }

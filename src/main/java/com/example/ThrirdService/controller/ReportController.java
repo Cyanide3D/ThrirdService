@@ -4,6 +4,7 @@ import com.example.ThrirdService.service.SchedulerService;
 import com.example.ThrirdService.simple.SimpleUnloadingReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,11 @@ public class ReportController {
     @GetMapping
     public List<SimpleUnloadingReport> report() {
         return schedulerService.unloading();
+    }
+
+    @GetMapping("/{name}")
+    public List<SimpleUnloadingReport> reportByFile(@PathVariable("name") String filename) {
+        return schedulerService.unloadingByFile(filename);
     }
 
 }
