@@ -71,20 +71,11 @@ public class Unloading implements Callable<SimpleUnloadingReport> {
 
                 for (Crane crane : cranes) {
                     fine += crane.getCraneFine();
-//                    sizeOfQueue += crane.getSize();
                 }
-//                signal++;
-//                if ((cranesQuantity == 1) && (Crane.sig == 1)) {
-//                for (Crane crane : cranes) {
-//                    fineWith1 += fine;
-//                    sizeOfQueue += crane.getSize();
+
                 Avg = Crane.staticSizeOfQueue / cranes.size();
-//                }
-//                }
             }
         }
-//        Ship nextShip = ships.peek()
-//        ConcurrentLinkedQueue<Ship> queueOfShips = new ConcurrentLinkedQueue<>(ships);
         totalFine += fine;
 
 

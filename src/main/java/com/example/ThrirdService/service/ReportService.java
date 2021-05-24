@@ -1,8 +1,6 @@
 package com.example.ThrirdService.service;
 
-import com.example.ThrirdService.model.Report;
 import com.example.ThrirdService.simple.SimpleShipUnloadingReport;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;

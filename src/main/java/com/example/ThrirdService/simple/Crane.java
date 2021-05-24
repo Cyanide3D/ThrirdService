@@ -102,7 +102,6 @@ public class Crane implements Callable<SimpleShipUnloadingReport> {
                         "\nMonth: " + nextShip.getMonth() + "\nDay: " + nextShip.getDay() + "\nHours: " + nextShip.getH()
                         + "\nMinutes: " + nextShip.getM() + "\nDelay: " + 0 + "\nReal begin time: " + nextShip.getArrivalTime() +
                         "\nUnloading time: " + nextShip.getUnloadingTime());
-//                smeshenie = 0;
                 report.setName(nextShip.getName());
                 report.setCargoType(nextShip.cargo.getCargoType());
                 report.setArrivalTime(nextShip.getArrivalTime());

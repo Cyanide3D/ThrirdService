@@ -18,19 +18,6 @@ public class SimpleShipUnloadingReport {
     public SimpleShipUnloadingReport() {
     }
 
-    public SimpleShipUnloadingReport(String name, Cargo.CargoType cargoType, String month, int day, int hour, int minute, int arrivalTime, int delay, int beginTime, int unloadingTime) {
-        this.name = name;
-        this.cargoType = cargoType;
-        this.month = month;
-        this.day = day;
-        this.hour = hour;
-        this.minute = minute;
-        this.arrivalTime = arrivalTime;
-        this.delay = delay;
-        this.beginTime = beginTime;
-        this.unloadingTime = unloadingTime;
-    }
-
     public String getName() {
         return name;
     }
